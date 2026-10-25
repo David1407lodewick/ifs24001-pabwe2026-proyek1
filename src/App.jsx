@@ -113,10 +113,18 @@ function App() {
     setCurrentPath("/auth/login");
   }
 
-  // Delcom Grading menguji endpoint login pada /auth/login.
-  // /login tetap didukung sebagai alias agar tautan lama tidak rusak.
-  if (["/login", "/auth/login"].includes(currentPath)) return <LoginPage onLogin={handleLogin} />;
-  if (["/register", "/auth/register"].includes(currentPath)) return <RegisterPage onRegister={handleRegister} />;
+  function navigateToPath(path) {
+    window.history.pushState({}, "", path);
+    setCurrentPath(path);
+  }
+
+  // Rute publik autentikasi mendukung path standar dan alias lama.
+  if (["/login", "/auth/login"].includes(currentPath)) {
+    return <LoginPage onLogin={handleLogin} onNavigate={navigateToPath} />;
+  }
+  if (["/register", "/auth/register"].includes(currentPath)) {
+    return <RegisterPage onRegister={handleRegister} onNavigate={navigateToPath} />;
+  }
   if (currentPath === "/") return <PublicHome onLoginClick={() => {
     window.history.pushState({}, "", "/auth/login");
     setCurrentPath("/auth/login");
@@ -1371,7 +1379,7 @@ function PublicHome({ onLoginClick, onRegisterClick }) {
 }
 
 
-function LoginPage({ onLogin }) {
+function LoginPage({ onLogin, onNavigate }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -1390,7 +1398,7 @@ function LoginPage({ onLogin }) {
   return (
     <main className="login-page">
       <section className="login-card">
-        <a className="login-back" href="/">
+        <a className="login-back" href="/" onClick={(event) => { event.preventDefault(); onNavigate("/"); }}>
           ← Kembali ke halaman publik
         </a>
 
@@ -1444,7 +1452,7 @@ function LoginPage({ onLogin }) {
 
         <p className="register-prompt">
           Belum punya akun?{" "}
-          <a href="/auth/register">Daftar sekarang</a>
+          <a href="/auth/register" onClick={(event) => { event.preventDefault(); onNavigate("/auth/register"); }}>Daftar sekarang</a>
         </p>
       </section>
     </main>
@@ -1452,7 +1460,7 @@ function LoginPage({ onLogin }) {
 }
 
 
-function RegisterPage({ onRegister }) {
+function RegisterPage({ onRegister, onNavigate }) {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -1484,7 +1492,7 @@ function RegisterPage({ onRegister }) {
   return (
     <main className="login-page">
       <section className="login-card">
-        <a className="login-back" href="/">← Kembali ke halaman publik</a>
+        <a className="login-back" href="/" onClick={(event) => { event.preventDefault(); onNavigate("/"); }}>← Kembali ke halaman publik</a>
         <div className="login-logo">D</div>
         <h1>Buat akun DelStudyHub</h1>
         <p className="login-subtitle">Daftar terlebih dahulu. Setelah berhasil, gunakan akunmu untuk login.</p>
@@ -1495,10 +1503,10 @@ function RegisterPage({ onRegister }) {
           <label>Password<input autoComplete="new-password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Minimal 8 karakter" minLength={8} required /></label>
           <label>Konfirmasi password<input autoComplete="new-password" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Ulangi password" minLength={8} required /></label>
           {message && <p className={isError ? "login-error" : "register-success"} role="status">{message}</p>}
-          {message.startsWith("Registrasi berhasil") && <a className="primary-button login-submit register-login-link" href="/auth/login">Lanjut ke Login</a>}
+          {message.startsWith("Registrasi berhasil") && <a className="primary-button login-submit register-login-link" href="/auth/login" onClick={(event) => { event.preventDefault(); onNavigate("/auth/login"); }}>Lanjut ke Login</a>}
           {!message.startsWith("Registrasi berhasil") && <button className="primary-button login-submit" type="submit">Daftar</button>}
         </form>
-        <p className="register-prompt">Sudah punya akun? <a href="/auth/login">Login</a></p>
+        <p className="register-prompt">Sudah punya akun? <a href="/auth/login" onClick={(event) => { event.preventDefault(); onNavigate("/auth/login"); }}>Login</a></p>
       </section>
     </main>
   );
