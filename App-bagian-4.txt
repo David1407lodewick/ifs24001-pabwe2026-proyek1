@@ -1,0 +1,200 @@
+          className="delete-task"
+          onClick={() => deleteTask(task.id)}
+          aria-label="Hapus tugas"
+          title="Hapus tugas"
+        >
+          ×
+        </button>
+      </div>
+    );
+  }
+
+  function renderPage() {
+    if (activePage === "Dashboard") {
+      return (
+        <>
+          <section className="welcome-banner">
+            <div>
+              <span className="eyebrow">YOUR LEARNING SPACE</span>
+              <h2>Belajar lebih terarah.</h2>
+              <p>
+                Kelola perkuliahan, selesaikan tugas, dan capai
+                target belajarmu bersama DelStudyHub.
+              </p>
+              <button
+                className="banner-button"
+                onClick={() => navigateToPage("Tugas")}
+              >
+                Lihat tugas <span>→</span>
+              </button>
+            </div>
+
+            <div className="banner-decoration" aria-hidden="true">
+              <div className="book-illustration">▤</div>
+              <div className="floating-star">✳</div>
+            </div>
+          </section>
+
+          <section className="stats-grid">
+            <StatCard
+              icon="▤"
+              color="blue"
+              label="Mata Kuliah"
+              value={courses.length}
+              note="Mata kuliah terdaftar"
+            />
+            <StatCard
+              icon="◷"
+              color="orange"
+              label="Tugas Pending"
+              value={pending}
+              note="Perlu diselesaikan"
+            />
+            <StatCard
+              icon="✓"
+              color="green"
+              label="Tugas Selesai"
+              value={completed}
+              note="Berhasil diselesaikan"
+            />
+            <StatCard
+              icon="◎"
+              color="purple"
+              label="Progres Tugas"
+              value={`${tasks.length ? Math.round((completed / tasks.length) * 100) : 0}%`}
+              note="Penyelesaian tugas"
+            />
+          </section>
+
+          <section className="content-grid">
+            <div className="panel">
+              <div className="panel-heading">
+                <div>
+                  <h3>Tugas Terbaru</h3>
+                  <p>Pantau pekerjaan akademikmu.</p>
+                </div>
+                <button
+                  className="text-button"
+                  onClick={() => navigateToPage("Tugas")}
+                >
+                  Lihat semua →
+                </button>
+              </div>
+
+              <div className="task-list">
+                {tasks.length ? (
+                  tasks.slice(0, 4).map(renderTask)
+                ) : (
+                  <EmptyState text="Belum ada tugas. Tambahkan tugas pertamamu!" />
+                )}
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-heading">
+                <div>
+                  <h3>Mata Kuliah</h3>
+                  <p>Perjalanan belajarmu.</p>
+                </div>
+                <button
+                  className="text-button"
+                  onClick={() => navigateToPage("Mata Kuliah")}
+                >
+                  Lihat semua →
+                </button>
+              </div>
+
+              <div className="course-list">
+                {courses.slice(0, 3).map((course) => (
+                  <CourseItem course={course} key={course.id} />
+                ))}
+              </div>
+            </div>
+          </section>
+        </>
+      );
+    }
+
+    if (activePage === "Tugas") {
+      return (
+        <section className="panel page-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>Manajemen Tugas</h3>
+              <p>Atur deadline dan pantau status tugasmu.</p>
+            </div>
+            <button
+              className="primary-button"
+              onClick={() => setShowForm(!showForm)}
+            >
+              {showForm ? "Batal" : "+ Tambah Tugas"}
+            </button>
+          </div>
+
+          {showForm && (
+            <form className="task-form" onSubmit={addTask}>
+              <label>
+                Nama tugas
+                <input
+                  value={taskTitle}
+                  onChange={(event) => setTaskTitle(event.target.value)}
+                  placeholder="Contoh: Latihan sorting"
+                  required
+                />
+              </label>
+
+              <label>
+                Mata kuliah
+                <select
+                  value={taskCourse}
+                  onChange={(event) => setTaskCourse(event.target.value)}
+                >
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.name}>
+                      {course.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Deadline
+                <input
+                  type="date"
+                  value={taskDue}
+                  onChange={(event) => setTaskDue(event.target.value)}
+                  required
+                />
+              </label>
+
+              <button className="primary-button" type="submit">
+                Simpan Tugas
+              </button>
+            </form>
+          )}
+
+          <div className="task-list full-task-list">
+            {tasks.length ? (
+              tasks.map(renderTask)
+            ) : (
+              <EmptyState text="Belum ada tugas. Tambahkan tugas baru." />
+            )}
+          </div>
+        </section>
+      );
+    }
+
+    if (activePage === "Mata Kuliah") {
+      return (
+        <section className="panel page-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>Mata Kuliah Saya</h3>
+              <p>Ringkasan mata kuliah yang sedang dipelajari.</p>
+            </div>
+          </div>
+
+          <div className="all-courses">
+            {courses.map((course) => (
+              <CourseItem course={course} key={course.id} />
+            ))}

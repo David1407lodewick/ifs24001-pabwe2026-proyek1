@@ -1,0 +1,200 @@
+    setShowMemberForm(false);
+  }
+
+  function saveMember(event) {
+    event.preventDefault();
+    if (!selectedGroup || !memberName.trim() || !memberNim.trim()) return;
+
+    const memberData = {
+      id: editingMemberId ?? Date.now(),
+      name: memberName.trim(),
+      nim: memberNim.trim(),
+    };
+    setStudyGroups((previous) => previous.map((group) => {
+      if (group.id !== selectedGroup.id) return group;
+      const members = editingMemberId !== null
+        ? group.members.map((member) => member.id === editingMemberId ? memberData : member)
+        : [...group.members, memberData];
+      return { ...group, members };
+    }));
+    resetMemberForm();
+  }
+
+  function editMember(member) {
+    setEditingMemberId(member.id);
+    setMemberName(member.name);
+    setMemberNim(member.nim);
+    setShowMemberForm(true);
+  }
+
+  function deleteMember(memberId) {
+    if (!selectedGroup || !window.confirm("Hapus anggota ini dari kelompok?")) return;
+    setStudyGroups((previous) => previous.map((group) =>
+      group.id === selectedGroup.id
+        ? { ...group, members: group.members.filter((member) => member.id !== memberId) }
+        : group
+    ));
+    if (editingMemberId === memberId) resetMemberForm();
+  }
+
+  function resetAgendaForm() {
+    setEditingAgendaId(null);
+    setAgendaTitle("");
+    setAgendaDate("");
+    setAgendaTime("");
+    setAgendaLocation("");
+    setShowAgendaForm(false);
+  }
+
+  function saveAgenda(event) {
+    event.preventDefault();
+    if (!selectedGroup || !agendaTitle.trim() || !agendaDate || !agendaTime || !agendaLocation.trim()) return;
+
+    const agendaData = {
+      id: editingAgendaId ?? Date.now(),
+      title: agendaTitle.trim(),
+      date: agendaDate,
+      time: agendaTime,
+      location: agendaLocation.trim(),
+    };
+    setStudyGroups((previous) => previous.map((group) => {
+      if (group.id !== selectedGroup.id) return group;
+      const agendas = editingAgendaId !== null
+        ? group.agendas.map((agenda) => agenda.id === editingAgendaId ? agendaData : agenda)
+        : [...group.agendas, agendaData];
+      return { ...group, agendas };
+    }));
+    resetAgendaForm();
+  }
+
+  function editAgenda(agenda) {
+    setEditingAgendaId(agenda.id);
+    setAgendaTitle(agenda.title);
+    setAgendaDate(agenda.date);
+    setAgendaTime(agenda.time);
+    setAgendaLocation(agenda.location);
+    setShowAgendaForm(true);
+  }
+
+  function deleteAgenda(agendaId) {
+    if (!selectedGroup || !window.confirm("Hapus agenda diskusi ini?")) return;
+    setStudyGroups((previous) => previous.map((group) =>
+      group.id === selectedGroup.id
+        ? { ...group, agendas: group.agendas.filter((agenda) => agenda.id !== agendaId) }
+        : group
+    ));
+    if (editingAgendaId === agendaId) resetAgendaForm();
+  }
+
+  function resetScheduleForm() {
+    setEditingScheduleId(null);
+    setScheduleCourse(courses[0]?.name || "");
+    setScheduleDay("Senin");
+    setScheduleStart("");
+    setScheduleEnd("");
+    setScheduleRoom("");
+    setShowScheduleForm(false);
+  }
+
+  function saveSchedule(event) {
+    event.preventDefault();
+
+    if (
+      !scheduleCourse ||
+      !scheduleDay ||
+      !scheduleStart ||
+      !scheduleEnd ||
+      !scheduleRoom.trim()
+    ) {
+      return;
+    }
+
+    if (scheduleStart >= scheduleEnd) {
+      alert("Jam selesai harus setelah jam mulai.");
+      return;
+    }
+
+    const scheduleData = {
+      id: editingScheduleId ?? Date.now(),
+      course: scheduleCourse,
+      day: scheduleDay,
+      startTime: scheduleStart,
+      endTime: scheduleEnd,
+      room: scheduleRoom.trim(),
+    };
+
+    if (editingScheduleId !== null) {
+      setSchedules((previous) =>
+        previous.map((schedule) =>
+          schedule.id === editingScheduleId ? scheduleData : schedule
+        )
+      );
+    } else {
+      setSchedules((previous) => [...previous, scheduleData]);
+    }
+
+    resetScheduleForm();
+  }
+
+  function editSchedule(schedule) {
+    setEditingScheduleId(schedule.id);
+    setScheduleCourse(schedule.course);
+    setScheduleDay(schedule.day);
+    setScheduleStart(schedule.startTime);
+    setScheduleEnd(schedule.endTime);
+    setScheduleRoom(schedule.room);
+    setShowScheduleForm(true);
+  }
+
+  function deleteSchedule(id) {
+    const confirmed = window.confirm("Yakin ingin menghapus jadwal ini?");
+    if (confirmed) {
+      setSchedules((previous) =>
+        previous.filter((schedule) => schedule.id !== id)
+      );
+    }
+  }
+
+  const selectedGroup = studyGroups.find((group) => group.id === selectedGroupId) || null;
+
+  const daysOfWeek = [
+    "Senin",
+    "Selasa",
+    "Rabu",
+    "Kamis",
+    "Jumat",
+    "Sabtu",
+    "Minggu",
+  ];
+
+  function formatDate(date) {
+    if (!date) return "-";
+
+    return new Date(`${date}T00:00:00`).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  function renderTask(task) {
+    return (
+      <div className="task-row" key={task.id}>
+        <button
+          className={`task-check ${task.done ? "checked" : ""}`}
+          onClick={() => toggleTask(task.id)}
+          aria-label={task.done ? "Tandai belum selesai" : "Tandai selesai"}
+        >
+          {task.done ? "✓" : ""}
+        </button>
+
+        <div className="task-info">
+          <span className={task.done ? "task-title is-done" : "task-title"}>
+            {task.title}
+          </span>
+          <span className="task-course">{task.course}</span>
+        </div>
+
+        <span className="task-date">{formatDate(task.due)}</span>
+
+        <button

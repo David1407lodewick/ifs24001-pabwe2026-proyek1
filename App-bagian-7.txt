@@ -1,0 +1,200 @@
+                    <button className="primary-button" type="submit">{editingAgendaId !== null ? "Simpan Perubahan" : "Simpan Agenda"}</button>
+                  </form>
+                )}
+                <div className="task-list full-task-list">
+                  {selectedGroup.agendas?.length ? [...selectedGroup.agendas].sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`)).map((agenda) => (
+                    <div className="task-row" key={agenda.id}>
+                      <div className="task-info"><span className="task-title">{agenda.title}</span><span className="task-course">{formatDate(agenda.date)} · {agenda.time}</span><span className="task-course">Tempat: {agenda.location}</span></div>
+                      <button className="text-button" type="button" onClick={() => editAgenda(agenda)}>Edit</button>
+                      <button className="delete-task" type="button" onClick={() => deleteAgenda(agenda.id)} aria-label={`Hapus agenda ${agenda.title}`} title="Hapus agenda">×</button>
+                    </div>
+                  )) : <EmptyState text="Belum ada agenda diskusi untuk kelompok ini." />}
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    const descriptions = {
+      Jadwal: "Rencanakan jadwal kuliah dan waktu belajar mandiri.",
+      Materi: "Kelola catatan, rangkuman, dan tautan materi kuliah.",
+      "Kelompok Belajar":
+        "Ruang untuk merencanakan belajar bersama teman.",
+    };
+
+    return (
+      <section className="panel empty-page">
+        <div className="empty-icon">✳</div>
+        <h3>{activePage}</h3>
+        <p>
+          {descriptions[activePage] ||
+            "Halaman profil dan pengaturan pengguna."}
+        </p>
+        <span className="coming-soon">
+          Dipersiapkan untuk tahap berikutnya
+        </span>
+      </section>
+    );
+  }
+
+  return (
+    <div className="app-shell">
+      <aside className="sidebar">
+        <a
+          className="brand"
+          href="#dashboard"
+          onClick={(event) => {
+            event.preventDefault();
+            navigateToPage("Dashboard");
+          }}
+        >
+          <div className="brand-icon">D</div>
+          <div>
+            <span className="brand-name">DelStudyHub</span>
+            <span className="brand-caption">YOUR CAMPUS COMPANION</span>
+          </div>
+        </a>
+
+        <div className="sidebar-label">MENU UTAMA</div>
+
+        <nav className="navigation">
+          {navigation.map((item) => (
+            <div key={item.label}>
+              {item.section && item.label !== "Dashboard" && (
+                <div className="sidebar-label section-label">
+                  {item.section}
+                </div>
+              )}
+
+              <button
+                className={`nav-item ${
+                  activePage === item.label ? "active" : ""
+                }`}
+                onClick={() => {
+                  navigateToPage(item.label);
+                  setShowForm(false);
+                  setShowMaterialForm(false);
+                }}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span>{item.label}</span>
+
+                {item.label === "Tugas" && pending > 0 && (
+                  <span className="nav-count">{pending}</span>
+                )}
+              </button>
+            </div>
+          ))}
+        </nav>
+
+        <div className="sidebar-bottom">
+          <div className="help-card">
+            <div className="help-icon">✦</div>
+            <strong>Terus semangat!</strong>
+            <p>
+              Langkah kecil hari ini membawa hasil besar esok hari.
+            </p>
+          </div>
+
+          <button
+            className={`nav-item profile-link ${
+              activePage === "Profil" ? "active" : ""
+            }`}
+            onClick={() => navigateToPage("Profil")}
+          >
+            <span className="avatar">D</span>
+            <span className="profile-text">
+              <strong>Mahasiswa Del</strong>
+              <small>Student account</small>
+            </span>
+            <span className="profile-menu">···</span>
+          </button>
+        </div>
+      </aside>
+
+      <main className="main-area">
+        <header className="topbar">
+          <div>
+            <div className="breadcrumb">
+              Workspace / {activePage}
+            </div>
+            <h1>{activePage}</h1>
+          </div>
+
+          <div className="topbar-right">
+            <span className="today-label">
+              {new Date().toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
+            <div className="top-avatar">D</div>
+            <button className="logout-button" type="button" onClick={onLogout}>Keluar</button>
+          </div>
+        </header>
+
+        <div className="page-content">{renderPage()}</div>
+
+        <footer className="footer">
+          <span>© 2026 DelStudyHub</span>
+          <span>Belajar, berkembang, berkolaborasi.</span>
+        </footer>
+      </main>
+    </div>
+  );
+}
+
+function PublicHome({ onLoginClick, onRegisterClick }) {
+  return (
+    <main className="public-home">
+      <nav className="public-nav">
+        <a className="public-brand" href="/">DelStudyHub</a>
+        <div className="public-nav-actions"><button className="secondary-button" onClick={onRegisterClick}>Daftar</button><button className="primary-button" onClick={onLoginClick}>Login</button></div>
+      </nav>
+      <section className="public-hero">
+        <span className="public-eyebrow">YOUR CAMPUS COMPANION</span>
+        <h1>Belajar lebih teratur bersama DelStudyHub.</h1>
+        <p>Kelola tugas, jadwal kuliah, materi, dan kelompok belajar dalam satu tempat.</p>
+        <div className="public-cta-row"><button className="primary-button public-cta" onClick={onRegisterClick}>Buat Akun →</button><button className="secondary-button public-cta" onClick={onLoginClick}>Sudah punya akun? Login</button></div>
+      </section>
+      <section className="public-features">
+        <article><strong>✓ Tugas</strong><p>Pantau tugas yang belum selesai dan tenggat waktu.</p></article>
+        <article><strong>▦ Jadwal</strong><p>Atur jadwal kuliah dan kegiatan belajar.</p></article>
+        <article><strong>♧ Kolaborasi</strong><p>Kelola materi dan kelompok belajar.</p></article>
+      </section>
+    </main>
+  );
+}
+
+function LoginPage({ onLogin }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  function submitLogin(event) {
+    event.preventDefault();
+    if (!onLogin(username.trim(), password)) {
+      setError("Username atau password tidak sesuai.");
+    }
+  }
+
+  return (
+    <main className="login-page">
+      <section className="login-card">
+        <a className="login-back" href="/">← Kembali ke halaman publik</a>
+        <div className="login-logo">D</div>
+        <h1>Masuk ke DelStudyHub</h1>
+        <p className="login-subtitle">Silakan masuk untuk membuka dashboard dan fitur belajar.</p>
+        <form onSubmit={submitLogin} className="login-form">
+          <label>Username<input autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Masukkan username" required /></label>
+          <label>Password<input autoComplete="current-password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Masukkan password" required /></label>
+          {error && <p className="login-error" role="alert">{error}</p>}
+          <button className="primary-button login-submit" type="submit">Login</button>
+        </form>
+        <p className="register-prompt">Belum punya akun? <a href="/auth/register">Daftar sekarang</a></p>
+      </section>
+    </main>

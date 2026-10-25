@@ -1,0 +1,200 @@
+  const [groupName, setGroupName] = useState("");
+  const [groupCourse, setGroupCourse] = useState(initialCourses[0]?.name || "");
+  const [groupDescription, setGroupDescription] = useState("");
+  const [showMemberForm, setShowMemberForm] = useState(false);
+  const [editingMemberId, setEditingMemberId] = useState(null);
+  const [memberName, setMemberName] = useState("");
+  const [memberNim, setMemberNim] = useState("");
+  const [showAgendaForm, setShowAgendaForm] = useState(false);
+  const [editingAgendaId, setEditingAgendaId] = useState(null);
+  const [agendaTitle, setAgendaTitle] = useState("");
+  const [agendaDate, setAgendaDate] = useState("");
+  const [agendaTime, setAgendaTime] = useState("");
+  const [agendaLocation, setAgendaLocation] = useState("");
+
+  const [showForm, setShowForm] = useState(false);
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskCourse, setTaskCourse] = useState(initialCourses[0].name);
+  const [taskDue, setTaskDue] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem("delstudyhub_tasks", JSON.stringify(tasks));
+  }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem("delstudyhub_courses", JSON.stringify(courses));
+  }, [courses]);
+
+  useEffect(() => {
+    localStorage.setItem("delstudyhub_schedules", JSON.stringify(schedules));
+  }, [schedules]);
+
+  useEffect(() => {
+    localStorage.setItem("delstudyhub_materials", JSON.stringify(materials));
+  }, [materials]);
+
+  useEffect(() => {
+    localStorage.setItem("delstudyhub_groups", JSON.stringify(studyGroups));
+  }, [studyGroups]);
+
+  const completed = tasks.filter((task) => task.done).length;
+  const pending = tasks.filter((task) => !task.done).length;
+
+  function addTask(event) {
+    event.preventDefault();
+
+    if (!taskTitle.trim() || !taskDue) return;
+
+    setTasks((previous) => [
+      ...previous,
+      {
+        id: Date.now(),
+        title: taskTitle.trim(),
+        course: taskCourse,
+        due: taskDue,
+        done: false,
+      },
+    ]);
+
+    setTaskTitle("");
+    setTaskDue("");
+    setShowForm(false);
+  }
+
+  function toggleTask(id) {
+    setTasks((previous) =>
+      previous.map((task) =>
+        task.id === id ? { ...task, done: !task.done } : task
+      )
+    );
+  }
+
+  function deleteTask(id) {
+    setTasks((previous) => previous.filter((task) => task.id !== id));
+  }
+
+  function resetMaterialForm() {
+    setEditingMaterialId(null);
+    setMaterialTitle("");
+    setMaterialCourse(courses[0]?.name || "");
+    setMaterialUrl("");
+    setShowMaterialForm(false);
+  }
+
+  function saveMaterial(event) {
+    event.preventDefault();
+
+    const trimmedTitle = materialTitle.trim();
+    const trimmedUrl = materialUrl.trim();
+
+    if (!trimmedTitle || !materialCourse || !trimmedUrl) return;
+
+    // Pastikan tautan menggunakan protokol HTTP atau HTTPS.
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(trimmedUrl);
+    } catch {
+      alert("Masukkan tautan yang valid, misalnya https://example.com/materi");
+      return;
+    }
+
+    if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+      alert("Tautan materi harus menggunakan HTTP atau HTTPS.");
+      return;
+    }
+
+    const materialData = {
+      id: editingMaterialId ?? Date.now(),
+      title: trimmedTitle,
+      course: materialCourse,
+      url: parsedUrl.href,
+    };
+
+    if (editingMaterialId !== null) {
+      setMaterials((previous) =>
+        previous.map((material) =>
+          material.id === editingMaterialId ? materialData : material
+        )
+      );
+    } else {
+      setMaterials((previous) => [...previous, materialData]);
+    }
+
+    resetMaterialForm();
+  }
+
+  function editMaterial(material) {
+    setEditingMaterialId(material.id);
+    setMaterialTitle(material.title);
+    setMaterialCourse(material.course);
+    setMaterialUrl(material.url);
+    setShowMaterialForm(true);
+  }
+
+  function deleteMaterial(id) {
+    const confirmed = window.confirm("Yakin ingin menghapus materi ini?");
+    if (confirmed) {
+      setMaterials((previous) =>
+        previous.filter((material) => material.id !== id)
+      );
+    }
+  }
+
+  function resetGroupForm() {
+    setEditingGroupId(null);
+    setGroupName("");
+    setGroupCourse(courses[0]?.name || "");
+    setGroupDescription("");
+    setShowGroupForm(false);
+  }
+
+  function saveGroup(event) {
+    event.preventDefault();
+    if (!groupName.trim() || !groupCourse) return;
+
+    const groupData = {
+      id: editingGroupId ?? Date.now(),
+      name: groupName.trim(),
+      course: groupCourse,
+      description: groupDescription.trim(),
+      members:
+        editingGroupId !== null
+          ? studyGroups.find((group) => group.id === editingGroupId)?.members || []
+          : [],
+      agendas:
+        editingGroupId !== null
+          ? studyGroups.find((group) => group.id === editingGroupId)?.agendas || []
+          : [],
+    };
+
+    if (editingGroupId !== null) {
+      setStudyGroups((previous) =>
+        previous.map((group) => group.id === editingGroupId ? groupData : group)
+      );
+    } else {
+      setStudyGroups((previous) => [...previous, groupData]);
+      setSelectedGroupId(groupData.id);
+    }
+    resetGroupForm();
+  }
+
+  function editGroup(group) {
+    setEditingGroupId(group.id);
+    setGroupName(group.name);
+    setGroupCourse(group.course);
+    setGroupDescription(group.description || "");
+    setShowGroupForm(true);
+  }
+
+  function deleteGroup(id) {
+    if (window.confirm("Hapus kelompok ini beserta anggota dan agendanya?")) {
+      setStudyGroups((previous) => previous.filter((group) => group.id !== id));
+      if (selectedGroupId === id) setSelectedGroupId(null);
+      if (editingGroupId === id) resetGroupForm();
+    }
+  }
+
+  function resetMemberForm() {
+    setEditingMemberId(null);
+    setMemberName("");
+    setMemberNim("");
