@@ -1370,6 +1370,7 @@ function PublicHome({ onLoginClick, onRegisterClick }) {
   );
 }
 
+
 function LoginPage({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -1377,7 +1378,11 @@ function LoginPage({ onLogin }) {
 
   function submitLogin(event) {
     event.preventDefault();
-    if (!onLogin(username.trim(), password)) {
+    setError("");
+
+    const success = onLogin(username.trim(), password);
+
+    if (!success) {
       setError("Username atau password tidak sesuai.");
     }
   }
@@ -1385,21 +1390,67 @@ function LoginPage({ onLogin }) {
   return (
     <main className="login-page">
       <section className="login-card">
-        <a className="login-back" href="/">← Kembali ke halaman publik</a>
+        <a className="login-back" href="/">
+          ← Kembali ke halaman publik
+        </a>
+
         <div className="login-logo">D</div>
+
         <h1>Masuk ke DelStudyHub</h1>
-        <p className="login-subtitle">Silakan masuk untuk membuka dashboard dan fitur belajar.</p>
+
+        <p className="login-subtitle">
+          Silakan masuk untuk membuka dashboard dan fitur belajar.
+        </p>
+
         <form onSubmit={submitLogin} className="login-form">
-          <label>Username<input autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Masukkan username" required /></label>
-          <label>Password<input autoComplete="current-password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Masukkan password" required /></label>
-          {error && <p className="login-error" role="alert">{error}</p>}
-          <button className="primary-button login-submit" type="submit">Login</button>
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            autoComplete="username"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            placeholder="Masukkan username"
+            required
+          />
+
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Masukkan password"
+            required
+          />
+
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
+
+          <button
+            id="btn-submit"
+            className="primary-button login-submit"
+            type="submit"
+          >
+            Login
+          </button>
         </form>
-        <p className="register-prompt">Belum punya akun? <a href="/auth/register">Daftar sekarang</a></p>
+
+        <p className="register-prompt">
+          Belum punya akun?{" "}
+          <a href="/auth/register">Daftar sekarang</a>
+        </p>
       </section>
     </main>
   );
 }
+
 
 function RegisterPage({ onRegister }) {
   const [name, setName] = useState("");
