@@ -1,0 +1,200 @@
+                  required
+                >
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.name}>
+                      {course.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Tautan materi
+                <input
+                  type="url"
+                  value={materialUrl}
+                  onChange={(event) => setMaterialUrl(event.target.value)}
+                  placeholder="https://..."
+                  required
+                />
+              </label>
+
+              <button className="primary-button" type="submit">
+                {editingMaterialId !== null ? "Simpan Perubahan" : "Simpan Materi"}
+              </button>
+            </form>
+          )}
+
+          <div className="task-form material-filters">
+            <label>
+              Cari materi
+              <input
+                type="search"
+                value={materialSearch}
+                onChange={(event) => setMaterialSearch(event.target.value)}
+                placeholder="Cari judul atau mata kuliah..."
+              />
+            </label>
+            <label>
+              Filter mata kuliah
+              <select
+                value={materialCourseFilter}
+                onChange={(event) => setMaterialCourseFilter(event.target.value)}
+              >
+                <option value="Semua">Semua mata kuliah</option>
+                {courses.map((course) => (
+                  <option key={course.id} value={course.name}>
+                    {course.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="task-list full-task-list">
+            {filteredMaterials.length ? (
+              filteredMaterials.map((material) => (
+                <div className="task-row" key={material.id}>
+                  <div className="task-info">
+                    <span className="task-title">{material.title}</span>
+                    <span className="task-course">{material.course}</span>
+                    <a
+                      className="task-course material-link"
+                      href={material.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Buka materi ↗
+                    </a>
+                  </div>
+                  <button
+                    className="text-button"
+                    type="button"
+                    onClick={() => editMaterial(material)}
+                    aria-label={`Edit materi ${material.title}`}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="delete-task"
+                    type="button"
+                    onClick={() => deleteMaterial(material.id)}
+                    aria-label={`Hapus materi ${material.title}`}
+                    title="Hapus materi"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            ) : (
+              <EmptyState
+                text={
+                  materials.length
+                    ? "Materi tidak ditemukan. Coba ubah kata pencarian atau filter mata kuliah."
+                    : "Belum ada materi. Klik Tambah Materi untuk menyimpan tautan pertamamu."
+                }
+              />
+            )}
+          </div>
+        </section>
+      );
+    }
+
+    if (activePage === "Kelompok Belajar") {
+      return (
+        <section className="panel page-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>Kelompok Belajar</h3>
+              <p>Buat kelompok, kelola anggota, dan rencanakan agenda diskusi.</p>
+            </div>
+            <button
+              className="primary-button"
+              type="button"
+              onClick={() => showGroupForm ? resetGroupForm() : (setEditingGroupId(null), setGroupName(""), setGroupCourse(courses[0]?.name || ""), setGroupDescription(""), setShowGroupForm(true))}
+            >
+              {showGroupForm ? "Batal" : "+ Tambah Kelompok"}
+            </button>
+          </div>
+
+          {showGroupForm && (
+            <form className="task-form" onSubmit={saveGroup}>
+              <label>
+                Nama kelompok
+                <input value={groupName} onChange={(event) => setGroupName(event.target.value)} placeholder="Contoh: Tim Belajar Struktur Data" required />
+              </label>
+              <label>
+                Mata kuliah
+                <select value={groupCourse} onChange={(event) => setGroupCourse(event.target.value)} required>
+                  {courses.map((course) => <option key={course.id} value={course.name}>{course.name}</option>)}
+                </select>
+              </label>
+              <label>
+                Deskripsi
+                <input value={groupDescription} onChange={(event) => setGroupDescription(event.target.value)} placeholder="Tujuan atau topik kelompok" />
+              </label>
+              <button className="primary-button" type="submit">{editingGroupId !== null ? "Simpan Perubahan" : "Simpan Kelompok"}</button>
+            </form>
+          )}
+
+          <div className="all-courses">
+            {studyGroups.length ? studyGroups.map((group) => (
+              <div className="task-row" key={group.id} style={{ alignItems: "center", flexWrap: "wrap" }}>
+                <button
+                  className={`text-button ${selectedGroupId === group.id ? "active" : ""}`}
+                  type="button"
+                  onClick={() => { setSelectedGroupId(group.id); resetMemberForm(); resetAgendaForm(); }}
+                  style={{ textAlign: "left", flex: "1 1 220px", whiteSpace: "normal" }}
+                >
+                  <strong>{group.name}</strong><br />
+                  <span className="task-course">{group.course} · {(group.members || []).length} anggota · {(group.agendas || []).length} agenda</span>
+                </button>
+                <button className="text-button" type="button" onClick={() => editGroup(group)}>Edit</button>
+                <button className="delete-task" type="button" onClick={() => deleteGroup(group.id)} aria-label={`Hapus kelompok ${group.name}`} title="Hapus kelompok">×</button>
+              </div>
+            )) : <EmptyState text="Belum ada kelompok belajar. Tambahkan kelompok pertamamu." />}
+          </div>
+
+          {selectedGroup && (
+            <div style={{ marginTop: "24px" }}>
+              <div className="panel-heading">
+                <div>
+                  <h3>{selectedGroup.name}</h3>
+                  <p>{selectedGroup.course}{selectedGroup.description ? ` · ${selectedGroup.description}` : ""}</p>
+                </div>
+              </div>
+
+              <div className="panel" style={{ marginBottom: "18px" }}>
+                <div className="panel-heading">
+                  <div><h3>Anggota Kelompok</h3><p>Catat nama dan NIM anggota.</p></div>
+                  <button className="primary-button" type="button" onClick={() => showMemberForm ? resetMemberForm() : (setEditingMemberId(null), setMemberName(""), setMemberNim(""), setShowMemberForm(true))}>{showMemberForm ? "Batal" : "+ Tambah Anggota"}</button>
+                </div>
+                {showMemberForm && (
+                  <form className="task-form" onSubmit={saveMember}>
+                    <label>Nama anggota<input value={memberName} onChange={(event) => setMemberName(event.target.value)} placeholder="Nama lengkap" required /></label>
+                    <label>NIM<input value={memberNim} onChange={(event) => setMemberNim(event.target.value)} placeholder="Nomor induk mahasiswa" required /></label>
+                    <button className="primary-button" type="submit">{editingMemberId !== null ? "Simpan Perubahan" : "Simpan Anggota"}</button>
+                  </form>
+                )}
+                <div className="task-list full-task-list">
+                  {selectedGroup.members?.length ? selectedGroup.members.map((member) => (
+                    <div className="task-row" key={member.id}>
+                      <div className="task-info"><span className="task-title">{member.name}</span><span className="task-course">NIM: {member.nim}</span></div>
+                      <button className="text-button" type="button" onClick={() => editMember(member)}>Edit</button>
+                      <button className="delete-task" type="button" onClick={() => deleteMember(member.id)} aria-label={`Hapus anggota ${member.name}`} title="Hapus anggota">×</button>
+                    </div>
+                  )) : <EmptyState text="Belum ada anggota di kelompok ini." />}
+                </div>
+              </div>
+
+              <div className="panel">
+                <div className="panel-heading">
+                  <div><h3>Agenda Diskusi</h3><p>Atur waktu dan lokasi pertemuan kelompok.</p></div>
+                  <button className="primary-button" type="button" onClick={() => showAgendaForm ? resetAgendaForm() : (setEditingAgendaId(null), setAgendaTitle(""), setAgendaDate(""), setAgendaTime(""), setAgendaLocation(""), setShowAgendaForm(true))}>{showAgendaForm ? "Batal" : "+ Tambah Agenda"}</button>
+                </div>
+                {showAgendaForm && (
+                  <form className="task-form" onSubmit={saveAgenda}>
+                    <label>Topik diskusi<input value={agendaTitle} onChange={(event) => setAgendaTitle(event.target.value)} placeholder="Contoh: Persiapan ujian" required /></label>
+                    <label>Tanggal<input type="date" value={agendaDate} onChange={(event) => setAgendaDate(event.target.value)} required /></label>
+                    <label>Jam<input type="time" value={agendaTime} onChange={(event) => setAgendaTime(event.target.value)} required /></label>
+                    <label>Tempat atau tautan pertemuan<input value={agendaLocation} onChange={(event) => setAgendaLocation(event.target.value)} placeholder="Contoh: Perpustakaan / Google Meet" required /></label>

@@ -1,0 +1,95 @@
+  );
+}
+
+function RegisterPage({ onRegister }) {
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
+
+  function submitRegister(event) {
+    event.preventDefault();
+    if (password.length < 8) {
+      setIsError(true);
+      setMessage("Password harus terdiri dari minimal 8 karakter.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setIsError(true);
+      setMessage("Konfirmasi password tidak sama.");
+      return;
+    }
+    const result = onRegister({ name, username, email, password });
+    setIsError(!result.ok);
+    setMessage(result.message);
+    if (result.ok) {
+      setName(""); setUsername(""); setEmail(""); setPassword(""); setConfirmPassword("");
+    }
+  }
+
+  return (
+    <main className="login-page">
+      <section className="login-card">
+        <a className="login-back" href="/">← Kembali ke halaman publik</a>
+        <div className="login-logo">D</div>
+        <h1>Buat akun DelStudyHub</h1>
+        <p className="login-subtitle">Daftar terlebih dahulu. Setelah berhasil, gunakan akunmu untuk login.</p>
+        <form onSubmit={submitRegister} className="login-form">
+          <label>Nama lengkap<input autoComplete="name" value={name} onChange={e => setName(e.target.value)} placeholder="Nama lengkap" required /></label>
+          <label>Username<input autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Buat username" minLength={3} required /></label>
+          <label>Email<input autoComplete="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="nama@email.com" required /></label>
+          <label>Password<input autoComplete="new-password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Minimal 8 karakter" minLength={8} required /></label>
+          <label>Konfirmasi password<input autoComplete="new-password" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Ulangi password" minLength={8} required /></label>
+          {message && <p className={isError ? "login-error" : "register-success"} role="status">{message}</p>}
+          {message.startsWith("Registrasi berhasil") && <a className="primary-button login-submit register-login-link" href="/auth/login">Lanjut ke Login</a>}
+          {!message.startsWith("Registrasi berhasil") && <button className="primary-button login-submit" type="submit">Daftar</button>}
+        </form>
+        <p className="register-prompt">Sudah punya akun? <a href="/auth/login">Login</a></p>
+      </section>
+    </main>
+  );
+}
+
+function StatCard({ icon, color, label, value, note }) {
+  return (
+    <div className="stat-card">
+      <div className={`stat-icon ${color}`}>{icon}</div>
+      <div className="stat-label">{label}</div>
+      <div className="stat-value">{value}</div>
+      <div className="stat-note">{note}</div>
+    </div>
+  );
+}
+
+function CourseItem({ course }) {
+  return (
+    <div className="course-item">
+      <div className={`course-icon ${course.color}`}>
+        {course.code.slice(0, 2)}
+      </div>
+
+      <div className="course-info">
+        <strong>{course.name}</strong>
+        <span>{course.code}</span>
+
+        <div className="progress-track">
+          <div
+            className={`progress-fill ${course.color}`}
+            style={{ width: `${course.progress}%` }}
+          />
+        </div>
+      </div>
+
+      <span className="progress-label">{course.progress}%</span>
+    </div>
+  );
+}
+
+function EmptyState({ text }) {
+  return <div className="empty-state">{text}</div>;
+}
+
+export default App;

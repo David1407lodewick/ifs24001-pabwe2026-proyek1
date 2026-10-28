@@ -1,0 +1,200 @@
+          </div>
+        </section>
+      );
+    }
+
+    if (activePage === "Jadwal") {
+      const sortedSchedules = [...schedules].sort((a, b) => {
+        const dayDifference =
+          daysOfWeek.indexOf(a.day) - daysOfWeek.indexOf(b.day);
+        return dayDifference || a.startTime.localeCompare(b.startTime);
+      });
+
+      return (
+        <section className="panel page-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>Jadwal Kuliah Saya</h3>
+              <p>Atur jadwal kuliah berdasarkan hari dan jam.</p>
+            </div>
+            <button
+              className="primary-button"
+              onClick={() => {
+                if (showScheduleForm) {
+                  resetScheduleForm();
+                } else {
+                  setEditingScheduleId(null);
+                  setScheduleCourse(courses[0]?.name || "");
+                  setScheduleDay("Senin");
+                  setScheduleStart("");
+                  setScheduleEnd("");
+                  setScheduleRoom("");
+                  setShowScheduleForm(true);
+                }
+              }}
+            >
+              {showScheduleForm ? "Batal" : "+ Tambah Jadwal"}
+            </button>
+          </div>
+
+          {showScheduleForm && (
+            <form className="task-form" onSubmit={saveSchedule}>
+              <label>
+                Mata kuliah
+                <select
+                  value={scheduleCourse}
+                  onChange={(event) => setScheduleCourse(event.target.value)}
+                  required
+                >
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.name}>
+                      {course.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Hari
+                <select
+                  value={scheduleDay}
+                  onChange={(event) => setScheduleDay(event.target.value)}
+                  required
+                >
+                  {daysOfWeek.map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Jam mulai
+                <input
+                  type="time"
+                  value={scheduleStart}
+                  onChange={(event) => setScheduleStart(event.target.value)}
+                  required
+                />
+              </label>
+
+              <label>
+                Jam selesai
+                <input
+                  type="time"
+                  value={scheduleEnd}
+                  onChange={(event) => setScheduleEnd(event.target.value)}
+                  required
+                />
+              </label>
+
+              <label>
+                Ruangan
+                <input
+                  value={scheduleRoom}
+                  onChange={(event) => setScheduleRoom(event.target.value)}
+                  placeholder="Contoh: IF-02"
+                  required
+                />
+              </label>
+
+              <button className="primary-button" type="submit">
+                {editingScheduleId !== null ? "Simpan Perubahan" : "Simpan Jadwal"}
+              </button>
+            </form>
+          )}
+
+          <div className="task-list full-task-list">
+            {sortedSchedules.length ? (
+              sortedSchedules.map((schedule) => (
+                <div className="task-row" key={schedule.id}>
+                  <div className="task-info">
+                    <span className="task-title">{schedule.course}</span>
+                    <span className="task-course">
+                      {schedule.day} · {schedule.startTime}–{schedule.endTime}
+                    </span>
+                    <span className="task-course">Ruangan: {schedule.room}</span>
+                  </div>
+                  <button
+                    className="text-button"
+                    type="button"
+                    onClick={() => editSchedule(schedule)}
+                    aria-label={`Edit jadwal ${schedule.course}`}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="delete-task"
+                    type="button"
+                    onClick={() => deleteSchedule(schedule.id)}
+                    aria-label={`Hapus jadwal ${schedule.course}`}
+                    title="Hapus jadwal"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            ) : (
+              <EmptyState text="Belum ada jadwal. Klik Tambah Jadwal untuk membuat jadwal kuliah pertamamu." />
+            )}
+          </div>
+        </section>
+      );
+    }
+
+    if (activePage === "Materi") {
+      const normalizedSearch = materialSearch.trim().toLowerCase();
+      const filteredMaterials = materials.filter((material) => {
+        const matchesSearch =
+          material.title.toLowerCase().includes(normalizedSearch) ||
+          material.course.toLowerCase().includes(normalizedSearch);
+        const matchesCourse =
+          materialCourseFilter === "Semua" ||
+          material.course === materialCourseFilter;
+        return matchesSearch && matchesCourse;
+      });
+
+      return (
+        <section className="panel page-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>Materi Kuliah</h3>
+              <p>Simpan dan temukan tautan materi pembelajaranmu.</p>
+            </div>
+            <button
+              className="primary-button"
+              type="button"
+              onClick={() => {
+                if (showMaterialForm) {
+                  resetMaterialForm();
+                } else {
+                  setEditingMaterialId(null);
+                  setMaterialTitle("");
+                  setMaterialCourse(courses[0]?.name || "");
+                  setMaterialUrl("");
+                  setShowMaterialForm(true);
+                }
+              }}
+            >
+              {showMaterialForm ? "Batal" : "+ Tambah Materi"}
+            </button>
+          </div>
+
+          {showMaterialForm && (
+            <form className="task-form" onSubmit={saveMaterial}>
+              <label>
+                Judul materi
+                <input
+                  value={materialTitle}
+                  onChange={(event) => setMaterialTitle(event.target.value)}
+                  placeholder="Contoh: Ringkasan Algoritma Pencarian"
+                  required
+                />
+              </label>
+
+              <label>
+                Mata kuliah
+                <select
+                  value={materialCourse}
+                  onChange={(event) => setMaterialCourse(event.target.value)}
