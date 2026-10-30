@@ -163,6 +163,46 @@ function Workspace({ initialPage = "Dashboard", onLogout }) {
     window.dispatchEvent(new Event("delstudyhub:navigate"));
   }
 
+  // Profil mahasiswa disimpan di LocalStorage agar tetap tersedia setelah refresh.
+  const [profile, setProfile] = useState(() =>
+    readStorage("delstudyhub_profile", {
+      name: localStorage.getItem("delstudyhub_user_name") || "",
+      nim: "",
+      prodi: "",
+      angkatan: "2024",
+      bio: "",
+    })
+  );
+  const [profileMessage, setProfileMessage] = useState("");
+
+  function updateProfileField(field, value) {
+    setProfile((current) => ({ ...current, [field]: value }));
+    setProfileMessage("");
+  }
+
+  function saveProfile(event) {
+    event.preventDefault();
+
+    if (!profile.name.trim() || !profile.nim.trim() || !profile.prodi.trim()) {
+      setProfileMessage("Nama lengkap, NIM, dan program studi wajib diisi.");
+      return;
+    }
+
+    const updatedProfile = {
+      ...profile,
+      name: profile.name.trim(),
+      nim: profile.nim.trim(),
+      prodi: profile.prodi.trim(),
+      angkatan: profile.angkatan.trim(),
+      bio: profile.bio.trim(),
+    };
+
+    setProfile(updatedProfile);
+    localStorage.setItem("delstudyhub_profile", JSON.stringify(updatedProfile));
+    localStorage.setItem("delstudyhub_user_name", updatedProfile.name);
+    setProfileMessage("Profil berhasil disimpan.");
+  }
+
   const [tasks, setTasks] = useState(() =>
     readStorage("delstudyhub_tasks", initialTasks)
   );
@@ -618,6 +658,87 @@ function Workspace({ initialPage = "Dashboard", onLogout }) {
   }
 
   function renderPage() {
+    if (activePage === "Profil") {
+      return (
+        <section className="panel">
+          <div className="section-heading">
+            <div>
+              <h2>Profil Mahasiswa</h2>
+              <p>Kelola informasi pribadi yang digunakan pada DelStudyHub.</p>
+            </div>
+          </div>
+
+          <div className="profile-page-content">
+            <form className="task-form" onSubmit={saveProfile}>
+              <label>
+                Nama lengkap
+                <input
+                  type="text"
+                  value={profile.name}
+                  onChange={(event) => updateProfileField("name", event.target.value)}
+                  placeholder="Masukkan nama lengkap"
+                  required
+                />
+              </label>
+              <label>
+                NIM
+                <input
+                  type="text"
+                  value={profile.nim}
+                  onChange={(event) => updateProfileField("nim", event.target.value)}
+                  placeholder="Masukkan NIM"
+                  required
+                />
+              </label>
+              <label>
+                Program studi
+                <input
+                  type="text"
+                  value={profile.prodi}
+                  onChange={(event) => updateProfileField("prodi", event.target.value)}
+                  placeholder="Contoh: S1 Informatika"
+                  required
+                />
+              </label>
+              <label>
+                Angkatan
+                <input
+                  type="text"
+                  value={profile.angkatan}
+                  onChange={(event) => updateProfileField("angkatan", event.target.value)}
+                  placeholder="Contoh: 2024"
+                />
+              </label>
+              <label>
+                Tentang saya
+                <textarea
+                  value={profile.bio}
+                  onChange={(event) => updateProfileField("bio", event.target.value)}
+                  placeholder="Tuliskan deskripsi singkat tentang diri kamu"
+                  rows={4}
+                />
+              </label>
+              {profileMessage && (
+                <p role="status" className="form-message">{profileMessage}</p>
+              )}
+              <button className="primary-button" type="submit">Simpan Profil</button>
+            </form>
+
+            <div className="profile-preview panel">
+              <div className="avatar profile-preview-avatar">
+                {(profile.name.trim().charAt(0) || "D").toUpperCase()}
+              </div>
+              <h3>{profile.name || "Nama Mahasiswa"}</h3>
+              <p>{profile.nim || "NIM belum diisi"}</p>
+              <p>{profile.prodi || "Program studi belum diisi"}</p>
+              <p>Angkatan {profile.angkatan || "-"}</p>
+              {profile.bio && <p>{profile.bio}</p>}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
     if (activePage === "Dashboard") {
       return (
         <>
@@ -1314,7 +1435,7 @@ function Workspace({ initialPage = "Dashboard", onLogout }) {
           >
             <span className="avatar">D</span>
             <span className="profile-text">
-              <strong>Mahasiswa Del</strong>
+              <strong>{profile.name || "Mahasiswa Del"}</strong>
               <small>Student account</small>
             </span>
             <span className="profile-menu">···</span>
@@ -1340,7 +1461,7 @@ function Workspace({ initialPage = "Dashboard", onLogout }) {
                 year: "numeric",
               })}
             </span>
-            <div className="top-avatar">D</div>
+            <div className="top-avatar">{(profile.name.trim().charAt(0) || "D").toUpperCase()}</div>
             <button className="logout-button" type="button" onClick={onLogout}>Keluar</button>
           </div>
         </header>

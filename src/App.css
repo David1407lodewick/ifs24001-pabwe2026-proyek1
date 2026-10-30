@@ -986,29 +986,12 @@
 .register-success { margin: 0; color: #14804a; background: #eaf8f0; border-radius: 8px; padding: 10px; font-size: 12px; line-height: 1.5; }
 .register-login-link { display: flex; align-items: center; text-decoration: none; }
 
-
-/* Halaman Profil Mahasiswa */
-.profile-page { display: flex; flex-direction: column; gap: 20px; }
-.profile-summary { display: flex; align-items: center; gap: 22px; padding: 26px; }
-.profile-summary-avatar, .profile-photo-preview { width: 88px; height: 88px; flex-shrink: 0; display: grid; place-items: center; overflow: hidden; border-radius: 50%; background: #e4eaff; color: #315be8; font-size: 30px; font-weight: 800; }
-.profile-summary-avatar img, .profile-photo-preview img, .avatar img, .top-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.profile-kicker { color: #315be8; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; }
-.profile-summary-info h2 { margin: 7px 0; font-size: 22px; }
-.profile-summary-info p { margin: 0; color: #8995aa; font-size: 12px; }
-.profile-form-panel { padding: 25px; }
-.profile-form { display: flex; flex-direction: column; gap: 22px; }
-.profile-photo-field { display: flex; align-items: center; gap: 18px; padding: 17px; border: 1px dashed #dce3ef; border-radius: 10px; background: #fafbff; }
-.profile-photo-field label, .profile-fields-grid label { display: flex; flex-direction: column; gap: 8px; color: #536078; font-size: 11px; font-weight: 700; }
-.profile-photo-field input { display: block; margin-top: 8px; color: #69768d; font-size: 11px; }
-.profile-photo-field small, .profile-fields-grid small { color: #9aa4b6; font-size: 10px; font-weight: 400; }
-.profile-fields-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.profile-fields-grid input, .profile-fields-grid select, .profile-fields-grid textarea { width: 100%; min-height: 42px; padding: 11px 12px; border: 1px solid #dfe5ef; border-radius: 8px; background: #fff; color: #39455b; font: inherit; font-size: 12px; }
-.profile-fields-grid textarea { resize: vertical; }
-.profile-fields-grid input:focus, .profile-fields-grid select:focus, .profile-fields-grid textarea:focus { outline: 2px solid #cdd8ff; border-color: #6483f7; }
-.profile-bio-field { grid-column: 1 / -1; }
-.profile-actions { display: flex; justify-content: flex-end; gap: 10px; }
-.profile-success, .profile-error { margin: 0; padding: 11px 13px; border-radius: 8px; font-size: 12px; }
-.profile-success { color: #14804a; background: #eaf8f0; }
-.profile-error { color: #c73535; background: #fff0f0; }
-.avatar, .top-avatar { overflow: hidden; }
-@media (max-width: 700px) { .profile-summary { padding: 18px; gap: 14px; } .profile-summary-avatar { width: 68px; height: 68px; font-size: 24px; } .profile-summary-info h2 { font-size: 17px; } .profile-fields-grid { grid-template-columns: 1fr; } .profile-bio-field { grid-column: auto; } .profile-form-panel { padding: 18px; } .profile-photo-field { align-items: flex-start; flex-direction: column; } }
+/* Penyempurnaan halaman Profil Mahasiswa */
+.profile-preview-card { display: flex; align-items: flex-start; gap: 18px; }
+.profile-preview-card h3 { margin: 2px 0 8px; color: #202b42; }
+.profile-preview-card p { margin: 5px 0; color: #778399; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.profile-summary-avatar img, .profile-photo-preview img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.profile-photo-preview { overflow: hidden; }
+.profile-form-panel .panel-heading { margin-bottom: 20px; }
+.profile-form .secondary-button { font-size: 11px; }
+@media (max-width: 700px) { .profile-preview-card { flex-direction: column; } }

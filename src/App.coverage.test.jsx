@@ -484,11 +484,58 @@ describe('Dashboard dan penyimpanan data', () => {
       }),
     ).toBeTruthy()
 
+
+    it('nama test sebelumnya', async () => {
+  // kode pengujian sebelumnya
+
+  expect(
+    // ...
+  ).toBeTruthy()
+})
+
+it('menampilkan halaman profil melalui navigasi profil', async () => {
+  bukaDashboard()
+
+  fireEvent.click(
+    screen.getByRole('button', { name: /mahasiswa del/i }),
+  )
+
     expect(
-      screen.getByText(
-        /halaman profil dan pengaturan pengguna/i,
-      ),
-    ).toBeTruthy()
+        await screen.findByRole('heading', {
+          level: 1,
+          name: 'Profil',
+        }),
+      ).toBeTruthy()
+
+      expect(
+        screen.getByLabelText(/nama lengkap/i),
+      ).toBeTruthy()
+
+      expect(
+        screen.getByLabelText(/nim/i),
+      ).toBeTruthy()
+
+      expect(
+        screen.getByLabelText(/prodi/i),
+      ).toBeTruthy()
+    })
+
+    it('menampilkan halaman profil melalui navigasi profil', async () => {
+      bukaDashboard()
+
+      fireEvent.click(screen.getByRole('button', { name: /mahasiswa del/i }))
+
+      expect(
+        await screen.findByRole('heading', {
+          level: 1,
+          name: 'Profil',
+        }),
+      ).toBeTruthy()
+
+      expect(
+        screen.getByText(/halaman profil dan pengaturan pengguna/i),
+      ).toBeTruthy()
+    })
   })
 })
 
