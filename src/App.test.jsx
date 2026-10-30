@@ -25,7 +25,7 @@ function isiFormRegistrasi({
 }
 
 function siapkanPenggunaLogin() {
-  sessionStorage.setItem('delstudyhub_authenticated', 'true')
+  localStorage.setItem('delstudyhub_authenticated', 'true')
   localStorage.setItem('delstudyhub_user', 'mahasiswa01')
   localStorage.setItem('delstudyhub_user_name', 'Mahasiswa Del')
 }
@@ -125,7 +125,7 @@ describe('Pengujian DelStudyHub', () => {
     isiInput('Password', 'Password123')
     fireEvent.click(screen.getByRole('button', { name: 'Login' }))
     expect(screen.getByRole('alert').textContent).toMatch(/username atau password tidak sesuai/i)
-    expect(sessionStorage.getItem('delstudyhub_authenticated')).not.toBe('true')
+    expect(localStorage.getItem('delstudyhub_authenticated')).not.toBe('true')
   })
 
   // 7. Melindungi dashboard dari pengguna yang belum login
@@ -172,7 +172,7 @@ describe('Pengujian DelStudyHub', () => {
     isiInput('Password', 'Belajar123')
     fireEvent.click(screen.getByRole('button', { name: 'Login' }))
     expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeTruthy()
-    expect(sessionStorage.getItem('delstudyhub_authenticated')).toBe('true')
+    expect(localStorage.getItem('delstudyhub_authenticated')).toBe('true')
     expect(localStorage.getItem('delstudyhub_user')).toBe('mahasiswa01')
     expect(localStorage.getItem('delstudyhub_user_name')).toBe('Mahasiswa Del')
     expect(window.location.pathname).toBe('/dashboard')

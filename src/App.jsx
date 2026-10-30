@@ -49,7 +49,7 @@ const PATH_PAGES = Object.fromEntries(
 function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [isAuthenticated, setIsAuthenticated] = useState(
-    () => sessionStorage.getItem("delstudyhub_authenticated") === "true"
+    () => localStorage.getItem("delstudyhub_authenticated") === "true"
   );
 
   useEffect(() => {
@@ -95,7 +95,7 @@ function App() {
     const users = readStorage("delstudyhub_users", []);
     const user = users.find(item => item.username.toLowerCase() === username.trim().toLowerCase() && item.password === password);
     if (!user) return false;
-    sessionStorage.setItem("delstudyhub_authenticated", "true");
+    localStorage.setItem("delstudyhub_authenticated", "true");
     localStorage.setItem("delstudyhub_user", user.username);
     localStorage.setItem("delstudyhub_user_name", user.name);
     setIsAuthenticated(true);
@@ -105,7 +105,7 @@ function App() {
   }
 
   function handleLogout() {
-    sessionStorage.removeItem("delstudyhub_authenticated");
+    localStorage.removeItem("delstudyhub_authenticated");
     localStorage.removeItem("delstudyhub_user");
     localStorage.removeItem("delstudyhub_user_name");
     setIsAuthenticated(false);

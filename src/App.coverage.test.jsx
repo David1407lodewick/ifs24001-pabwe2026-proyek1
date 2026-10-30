@@ -20,7 +20,7 @@ function isiInput(label, value) {
 }
 
 function siapkanPenggunaLogin() {
-  sessionStorage.setItem('delstudyhub_authenticated', 'true')
+  localStorage.setItem('delstudyhub_authenticated', 'true')
   localStorage.setItem('delstudyhub_user', 'mahasiswa01')
   localStorage.setItem('delstudyhub_user_name', 'Mahasiswa Del')
 }
@@ -40,9 +40,21 @@ function siapkanDataPengguna() {
 }
 
 function bukaDashboard() {
-  siapkanPenggunaLogin()
-  window.history.replaceState({}, '', '/dashboard')
+  // Gunakan alur login aplikasi yang sebenarnya agar state React,
+  // localStorage, dan route dashboard selalu tersinkron.
+  siapkanDataPengguna()
+  window.history.replaceState({}, '', '/auth/login')
   render(<App />)
+
+  isiInput('Username', 'mahasiswa01')
+  isiInput('Password', 'Belajar123')
+
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Login' }),
+  )
+
+  // handleLogin mengubah route secara sinkron melalui event form.
+  expect(window.location.pathname).toBe('/dashboard')
 }
 
 function klikNavigasi(nama) {
@@ -176,7 +188,7 @@ describe('Autentikasi dan routing', () => {
     )
 
     expect(
-      sessionStorage.getItem('delstudyhub_authenticated'),
+      localStorage.getItem('delstudyhub_authenticated'),
     ).toBeNull()
   })
 
@@ -196,7 +208,7 @@ describe('Autentikasi dan routing', () => {
     ).toBeTruthy()
 
     expect(
-      sessionStorage.getItem('delstudyhub_authenticated'),
+      localStorage.getItem('delstudyhub_authenticated'),
     ).toBe('true')
 
     expect(
@@ -220,7 +232,7 @@ describe('Autentikasi dan routing', () => {
     expect(window.location.pathname).toBe('/auth/login')
 
     expect(
-      sessionStorage.getItem('delstudyhub_authenticated'),
+      localStorage.getItem('delstudyhub_authenticated'),
     ).toBeNull()
 
     expect(
